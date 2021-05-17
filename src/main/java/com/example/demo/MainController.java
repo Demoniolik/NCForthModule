@@ -1,12 +1,15 @@
 package com.example.demo;
 
+import com.example.demo.model.Question;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+
 
 @Controller
 public class MainController {
@@ -31,7 +34,7 @@ public class MainController {
     @GetMapping("/authorize")
     public String authorizerUser(
             @RequestParam String userName) {
-
+        init();
         if (!isInList(userName)) {
             addNewUser(userName);
         }
@@ -59,6 +62,30 @@ public class MainController {
             throwables.printStackTrace();
         }
         return false;
+    }
+
+    @RequestMapping("/getFiveRandomQuestions")
+    public String getFiveRandomQuestion() {
+        List<Question> questions = new ArrayList<>();
+
+        try (Statement statement = connection.createStatement()) {
+            statement.execute(GET_FIVE_RANDOM_QUESTIONS);
+            ResultSet resultSet = statement.getResultSet();
+            while (resultSet.next()) {
+                questions.add(
+                        new Question(
+                                resultSet.getLong("id"),
+                                resultSet.getString("question"),
+                                resultSet.getString("answer"),
+                                resultSet.getInt("points")
+                        )
+                );
+            }
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        System.out.println(questions);
+        return "otherPage.html";
     }
 
 
