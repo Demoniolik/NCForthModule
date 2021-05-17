@@ -67,7 +67,7 @@ public class MainController {
     @RequestMapping("/getFiveRandomQuestions")
     public String getFiveRandomQuestion() {
         List<Question> questions = new ArrayList<>();
-
+        init();
         try (Statement statement = connection.createStatement()) {
             statement.execute(GET_FIVE_RANDOM_QUESTIONS);
             ResultSet resultSet = statement.getResultSet();
